@@ -18,6 +18,7 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
   List<Pictograma> seleccionados = [];
   List<String> frasesGuardadas = [];
   List<Pictograma> pictogramas = [];
+  Map<String, int> contadorUso = {}; // Contador para personalización IA
 
   final FlutterTts flutterTts = FlutterTts();
 
@@ -26,6 +27,7 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
     super.initState();
     cargarFrasesGuardadas();
     inicializarPictogramas();
+    cargarContadorUso();
   }
 
   Future<void> inicializarPictogramas() async {
@@ -37,22 +39,51 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
       return Pictograma(nombre: map['nombre'], imagen: map['imagen']);
     }).toList();
 
+    List<Pictograma> base = [
+      Pictograma(nombre: 'Quiero', imagen: 'assets/Pictogramas/quiero.png'),
+      Pictograma(nombre: 'Comer', imagen: 'assets/Pictogramas/comer.png'),
+      Pictograma(nombre: 'Agua', imagen: 'assets/Pictogramas/agua.png'),
+      Pictograma(nombre: 'Jugar', imagen: 'assets/Pictogramas/jugar.png'),
+      Pictograma(nombre: 'Baño', imagen: 'assets/Pictogramas/baño.png'),
+    ];
+
     setState(() {
-      pictogramas = [
-        Pictograma(nombre: 'Quiero', imagen: 'assets/Pictogramas/quiero.png'),
-        Pictograma(nombre: 'Comer', imagen: 'assets/Pictogramas/comer.png'),
-        Pictograma(nombre: 'Agua', imagen: 'assets/Pictogramas/agua.png'),
-        Pictograma(nombre: 'Jugar', imagen: 'assets/Pictogramas/jugar.png'),
-        Pictograma(nombre: 'Baño', imagen: 'assets/Pictogramas/baño.png'),
-        ...custom,
-      ];
+      pictogramas = [...base, ...custom];
+      ordenarPictogramasPorUso();
     });
+  }
+
+  void ordenarPictogramasPorUso() {
+    pictogramas.sort((a, b) {
+      int usoA = contadorUso[a.nombre] ?? 0;
+      int usoB = contadorUso[b.nombre] ?? 0;
+      return usoB.compareTo(usoA);
+    });
+  }
+
+  Future<void> cargarContadorUso() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonStr = prefs.getString('contador_uso');
+    if (jsonStr != null) {
+      setState(() {
+        contadorUso = Map<String, int>.from(jsonDecode(jsonStr));
+        ordenarPictogramasPorUso();
+      });
+    }
+  }
+
+  Future<void> guardarContadorUso() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('contador_uso', jsonEncode(contadorUso));
   }
 
   void agregarAPalabra(Pictograma p) {
     setState(() {
       seleccionados.add(p);
+      contadorUso[p.nombre] = (contadorUso[p.nombre] ?? 0) + 1;
     });
+    guardarContadorUso();
+    ordenarPictogramasPorUso();
   }
 
   void limpiarFrase() {
@@ -127,6 +158,7 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
       setState(() {
         pictogramas.add(nuevo);
       });
+      ordenarPictogramasPorUso();
     }
   }
 
