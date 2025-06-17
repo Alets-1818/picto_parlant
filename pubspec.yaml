@@ -26,4 +26,15 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/Pictogramas/
+    - assets/Pictogramas/Acciones/
+    - assets/Pictogramas/Carnes/
+    - assets/Pictogramas/Cocina/
+    - assets/Pictogramas/Deportes_juegos/
+    - assets/Pictogramas/Estado/
+    - assets/Pictogramas/Estudios/
+    - assets/Pictogramas/Lugares/
+    - assets/Pictogramas/Objetos/
+    - assets/Pictogramas/Postres/
+    - assets/Pictogramas/Ropa/
+    - assets/Pictogramas/Varios/
+    - assets/Pictogramas/Vegetales_frutas/
