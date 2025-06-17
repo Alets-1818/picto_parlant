@@ -22,6 +22,7 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
   List<Pictograma> pictogramas = [];
   Map<String, int> contadorUso = {};
   Map<String, Map<String, int>> coocurrencias = {};
+  String query = '';
 
   @override
   void initState() {
@@ -1929,7 +1930,7 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
         imagen: 'assets/Pictogramas/Vegetales_frutas/lechuga.png',
         categoria: 'Vegetales_frutas',
       ),
-    ];
+    ]; // ← Agrega pictogramas predeterminados aquí
 
     setState(() {
       pictogramas = [...base, ...custom];
@@ -2105,6 +2106,10 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
       porCategoria.putIfAbsent(c, () => []).add(p);
     }
 
+    final List<Pictograma> pictogramasFiltrados = pictogramas
+        .where((p) => p.nombre.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+
     return DefaultTabController(
       length: porCategoria.keys.length,
       child: Scaffold(
@@ -2116,15 +2121,28 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
               onPressed: agregarPictogramaPersonalizado,
             ),
           ],
-          bottom: TabBar(
-            isScrollable: true,
-            tabs: porCategoria.keys.map((c) => Tab(text: c)).toList(),
-          ),
+          bottom: query.isEmpty
+              ? TabBar(
+                  isScrollable: true,
+                  tabs: porCategoria.keys.map((c) => Tab(text: c)).toList(),
+                )
+              : null,
         ),
         body: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Buscar pictograma...',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => setState(() => query = value),
+              ),
+            ),
             SizedBox(
-              height: 100, // Establece una altura fija
+              height: 100,
               child: ReorderableListView(
                 scrollDirection: Axis.horizontal,
                 buildDefaultDragHandles: false,
@@ -2149,11 +2167,8 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
                         ),
                         SizedBox(width: 4),
                         GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              seleccionados.removeAt(index);
-                            });
-                          },
+                          onTap: () =>
+                              setState(() => seleccionados.removeAt(index)),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -2170,7 +2185,6 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
                 }),
               ),
             ),
-
             if (seleccionados.isNotEmpty) ...[
               sugerenciaWidget(),
               ElevatedButton(
@@ -2187,92 +2201,94 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
               Expanded(
                 child: ListView.builder(
                   itemCount: frasesGuardadas.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(frasesGuardadas[index]),
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
-                          setState(() {
-                            frasesGuardadas.removeAt(index);
-                            prefs.setStringList(
-                              'frases_guardadas',
-                              frasesGuardadas,
-                            );
-                          });
-                        },
-                      ),
-                      onTap: () =>
-                          cargarFraseEnConstructor(frasesGuardadas[index]),
-                    );
-                  },
+                  itemBuilder: (context, index) => ListTile(
+                    title: Text(frasesGuardadas[index]),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        setState(() {
+                          frasesGuardadas.removeAt(index);
+                          prefs.setStringList(
+                            'frases_guardadas',
+                            frasesGuardadas,
+                          );
+                        });
+                      },
+                    ),
+                    onTap: () =>
+                        cargarFraseEnConstructor(frasesGuardadas[index]),
+                  ),
                 ),
               ),
             Expanded(
-              child: TabBarView(
-                children: porCategoria.keys.map((categoria) {
-                  final lista = porCategoria[categoria]!;
-                  return GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                      childAspectRatio: 0.75,
+              child: query.isNotEmpty
+                  ? GridView.builder(
+                      itemCount: pictogramasFiltrados.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        childAspectRatio: 0.75,
+                      ),
+                      itemBuilder: (context, index) {
+                        final p = pictogramasFiltrados[index];
+                        return buildPictogramaCard(p);
+                      },
+                    )
+                  : TabBarView(
+                      children: porCategoria.keys.map((categoria) {
+                        final lista = porCategoria[categoria]!;
+                        return GridView.builder(
+                          itemCount: lista.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 8,
+                                mainAxisSpacing: 8,
+                                childAspectRatio: 0.75,
+                              ),
+                          itemBuilder: (context, index) =>
+                              buildPictogramaCard(lista[index]),
+                        );
+                      }).toList(),
                     ),
-                    itemCount: lista.length,
-                    itemBuilder: (context, index) {
-                      final p = lista[index];
-                      return GestureDetector(
-                        onTap: () => agregarAPalabra(p),
-                        child: Card(
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 4.0,
-                              vertical: 6.0,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                p.imagen.startsWith('assets')
-                                    ? Image.asset(
-                                        p.imagen,
-                                        height: 50,
-                                        fit: BoxFit.contain,
-                                      )
-                                    : Image.file(
-                                        File(p.imagen),
-                                        height: 50,
-                                        fit: BoxFit.contain,
-                                      ),
-                                const SizedBox(height: 6),
-                                Expanded(
-                                  child: Center(
-                                    child: Text(
-                                      p.nombre,
-                                      textAlign: TextAlign.center,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(fontSize: 12),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                }).toList(),
-              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildPictogramaCard(Pictograma p) {
+    return GestureDetector(
+      onTap: () => agregarAPalabra(p),
+      child: Card(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              p.imagen.startsWith('assets')
+                  ? Image.asset(p.imagen, height: 50, fit: BoxFit.contain)
+                  : Image.file(File(p.imagen), height: 50, fit: BoxFit.contain),
+              const SizedBox(height: 6),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    p.nombre,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
