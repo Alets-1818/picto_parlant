@@ -4,9 +4,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('PictoParlant'),
-      ),
+      appBar: AppBar(title: Text('PictoParlant')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -23,6 +21,13 @@ class HomeScreen extends StatelessWidget {
                 Navigator.pushNamed(context, '/rutina');
               },
               child: Text('Rutina diaria'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/expresate');
+              },
+              child: Text('Exprésate'),
             ),
           ],
         ),
