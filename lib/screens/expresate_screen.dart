@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import '../models/pictograma.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+//xd
 class ExpresateScreen extends StatefulWidget {
   @override
   _ExpresateScreenState createState() => _ExpresateScreenState();
