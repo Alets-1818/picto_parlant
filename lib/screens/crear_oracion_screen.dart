@@ -16,7 +16,6 @@ class CrearOracionScreen extends StatefulWidget {
 
 class _CrearOracionScreenState extends State<CrearOracionScreen> {
   final FlutterTts flutterTts = FlutterTts();
-
   List<Pictograma> seleccionados = [];
   List<String> frasesGuardadas = [];
   List<Pictograma> pictogramas = [];
@@ -2092,8 +2091,10 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
     return ElevatedButton(
       onPressed: () => agregarAPalabra(pictogramaSugerido),
       style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.black, // texto negro
-        backgroundColor: Color(0xFFFFAB91), // fondo durazno
+        backgroundColor: Color(0xFFF8F2FF),
+        foregroundColor: Colors.black,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 2,
       ),
       child: Text('Sugerencia: ${pictogramaSugerido.nombre}'),
     );
@@ -2114,13 +2115,12 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
     return DefaultTabController(
       length: porCategoria.keys.length,
       child: Scaffold(
-        backgroundColor: Color(0xFF121212),
+        backgroundColor: Color(0xFFFAF9F6),
         appBar: AppBar(
           title: Text('Crear oración'),
           centerTitle: true,
-          backgroundColor: Color(0xFFFFAB91),
+          backgroundColor: Color(0xFFF2E6FF),
           foregroundColor: Colors.black,
-          elevation: 0,
           actions: [
             IconButton(
               icon: Icon(Icons.add_photo_alternate),
@@ -2130,10 +2130,9 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
           bottom: query.isEmpty
               ? TabBar(
                   isScrollable: true,
-                  indicatorColor: Colors.white,
-                  labelColor: Colors.black, // Color del texto activo
-                  unselectedLabelColor:
-                      Colors.black87, // Color del texto inactivo
+                  indicatorColor: Colors.black,
+                  labelColor: Colors.black,
+                  unselectedLabelColor: Colors.black54,
                   tabs: porCategoria.keys.map((c) => Tab(text: c)).toList(),
                 )
               : null,
@@ -2145,23 +2144,22 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
               TextField(
                 decoration: InputDecoration(
                   hintText: 'Buscar pictograma...',
-                  prefixIcon: Icon(Icons.search),
+                  prefixIcon: Icon(Icons.search, color: Colors.black54),
+                  filled: true,
+                  fillColor: Color(0xFFF8F2FF),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  filled: true,
-                  fillColor: Colors.white10,
-                  hintStyle: TextStyle(color: Colors.white70),
+                  hintStyle: TextStyle(color: Colors.black54),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 onChanged: (value) => setState(() => query = value),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               SizedBox(
                 height: 100,
                 child: ReorderableListView(
                   scrollDirection: Axis.horizontal,
-                  buildDefaultDragHandles: false,
                   onReorder: (oldIndex, newIndex) {
                     setState(() {
                       if (newIndex > oldIndex) newIndex -= 1;
@@ -2174,13 +2172,15 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
                     return Container(
                       key: ValueKey(p.nombre + index.toString()),
                       margin: EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF8F2FF),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.all(8),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          ReorderableDragStartListener(
-                            index: index,
-                            child: Icon(Icons.drag_handle, color: Colors.grey),
-                          ),
+                          Icon(Icons.drag_handle, color: Colors.black38),
                           SizedBox(width: 4),
                           GestureDetector(
                             onTap: () =>
@@ -2193,7 +2193,7 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
                                     : Image.file(File(p.imagen), height: 40),
                                 Text(
                                   p.nombre,
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(color: Colors.black),
                                 ),
                               ],
                             ),
@@ -2205,31 +2205,42 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
                 ),
               ),
               if (seleccionados.isNotEmpty) ...[
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 sugerenciaWidget(),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: limpiarFrase,
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFF8F2FF),
                     foregroundColor: Colors.black,
-                    backgroundColor: Color(0xFFFFAB91),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
                   ),
                   child: Text('Limpiar oración'),
                 ),
-
                 ElevatedButton(
-                  onPressed: limpiarFrase,
+                  onPressed: leerFrase,
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFF8F2FF),
                     foregroundColor: Colors.black,
-                    backgroundColor: Color(0xFFFFAB91),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
                   ),
                   child: Text('Leer oración'),
                 ),
                 ElevatedButton(
-                  onPressed: limpiarFrase,
+                  onPressed: guardarFrase,
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFF8F2FF),
                     foregroundColor: Colors.black,
-                    backgroundColor: Color(0xFFFFAB91),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
                   ),
                   child: Text('Guardar oración'),
                 ),
@@ -2239,9 +2250,10 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
                   child: ListView.builder(
                     itemCount: frasesGuardadas.length,
                     itemBuilder: (context, index) => ListTile(
+                      tileColor: Color(0xFFF8F2FF),
                       title: Text(
                         frasesGuardadas[index],
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.black),
                       ),
                       trailing: IconButton(
                         icon: Icon(Icons.delete, color: Colors.red),
@@ -2272,10 +2284,8 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
                           mainAxisSpacing: 12,
                           childAspectRatio: 0.75,
                         ),
-                        itemBuilder: (context, index) {
-                          final p = pictogramasFiltrados[index];
-                          return buildPictogramaCard(p);
-                        },
+                        itemBuilder: (context, index) =>
+                            buildPictogramaCard(pictogramasFiltrados[index]),
                       )
                     : TabBarView(
                         children: porCategoria.keys.map((categoria) {
@@ -2306,7 +2316,7 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
     return GestureDetector(
       onTap: () => agregarAPalabra(p),
       child: Card(
-        color: Color(0xFFFFAB91),
+        color: Color(0xFFF8F2FF),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 10.0),
@@ -2316,11 +2326,11 @@ class _CrearOracionScreenState extends State<CrearOracionScreen> {
               p.imagen.startsWith('assets')
                   ? Image.asset(p.imagen, height: 50, fit: BoxFit.contain)
                   : Image.file(File(p.imagen), height: 50, fit: BoxFit.contain),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Text(
                 p.nombre,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,

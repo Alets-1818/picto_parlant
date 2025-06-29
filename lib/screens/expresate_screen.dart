@@ -1916,7 +1916,7 @@ class _ExpresateScreenState extends State<ExpresateScreen> {
       imagen: 'assets/Pictogramas/Vegetales_frutas/lechuga.png',
       categoria: 'Vegetales_frutas',
     ),
-  ];
+  ]; // ← Agrega pictogramas predeterminados aquí
   Future<void> agregarPictogramaPersonalizado() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -2032,11 +2032,11 @@ class _ExpresateScreenState extends State<ExpresateScreen> {
     return DefaultTabController(
       length: filtrados.keys.length,
       child: Scaffold(
-        backgroundColor: Color(0xFF121212),
+        backgroundColor: Color(0xFFFAF9F6), // azul celeste
         appBar: AppBar(
           title: Text('Exprésate'),
           centerTitle: true,
-          backgroundColor: Color(0xFFFFAB91),
+          backgroundColor: Color(0xFFFAF9F6), // lavanda
           foregroundColor: Colors.black,
           actions: [
             IconButton(
@@ -2047,9 +2047,9 @@ class _ExpresateScreenState extends State<ExpresateScreen> {
           ],
           bottom: TabBar(
             isScrollable: true,
-            indicatorColor: Colors.white,
+            indicatorColor: Colors.black,
             labelColor: Colors.black,
-            unselectedLabelColor: Colors.black87,
+            unselectedLabelColor: Colors.black54,
             labelStyle: TextStyle(fontWeight: FontWeight.bold),
             tabs: filtrados.keys.map((c) => Tab(text: c)).toList(),
           ),
@@ -2057,18 +2057,22 @@ class _ExpresateScreenState extends State<ExpresateScreen> {
         body: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(12.0),
               child: TextField(
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
+                  fillColor: Color(0xFFF2E6FF),
+                  filled: true,
                   hintText: 'Buscar pictograma...',
-                  hintStyle: TextStyle(color: Colors.white70),
-                  prefixIcon: Icon(Icons.search, color: Colors.white70),
+                  hintStyle: TextStyle(color: Colors.black54),
+                  prefixIcon: Icon(Icons.search, color: Colors.black54),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white54),
+                    borderSide: BorderSide(color: Colors.black38),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                    borderSide: BorderSide(color: Colors.black),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 onChanged: (value) => setState(() => query = value),
@@ -2081,18 +2085,23 @@ class _ExpresateScreenState extends State<ExpresateScreen> {
                   scrollDirection: Axis.horizontal,
                   children: seleccionados.map((p) {
                     return Container(
-                      margin: EdgeInsets.symmetric(horizontal: 4),
+                      margin: EdgeInsets.symmetric(horizontal: 6),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF2E6FF), // verde menta
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.all(8),
                       child: Column(
                         children: [
                           GestureDetector(
-                            onTap: () {
-                              setState(() => seleccionados.remove(p));
-                            },
+                            onTap: () =>
+                                setState(() => seleccionados.remove(p)),
                             child: p.imagen.startsWith('assets')
                                 ? Image.asset(p.imagen, height: 40)
                                 : Image.file(File(p.imagen), height: 40),
                           ),
-                          Text(p.nombre, style: TextStyle(color: Colors.white)),
+                          SizedBox(height: 4),
+                          Text(p.nombre, style: TextStyle(color: Colors.black)),
                         ],
                       ),
                     );
@@ -2100,9 +2109,19 @@ class _ExpresateScreenState extends State<ExpresateScreen> {
                 ),
               ),
             if (seleccionados.isNotEmpty)
-              ElevatedButton(
-                onPressed: generarYLeerFrase,
-                child: Text("Leer con IA"),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFF2E6FF),
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: generarYLeerFrase,
+                  child: Text("Leer con IA"),
+                ),
               ),
             Expanded(
               child: TabBarView(
@@ -2123,7 +2142,7 @@ class _ExpresateScreenState extends State<ExpresateScreen> {
                         onTap: () => setState(() => seleccionados.add(p)),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Color(0xFFFFAB91),
+                            color: Color(0xFFF2E6FF), // verde menta
                             borderRadius: BorderRadius.circular(12),
                           ),
                           padding: const EdgeInsets.all(8.0),
